@@ -1,7 +1,7 @@
 package com.pluralsight.NorthwindTradersAPI4.controllers;
 
-import com.pluralsight.northwindTradersAPI3.dao.interfaces.ICategoryDAO;
-import com.pluralsight.northwindTradersAPI3.models.Category;
+import com.pluralsight.NorthwindTradersAPI4.dao.interfaces.ICategoryDAO;
+import com.pluralsight.NorthwindTradersAPI4.models.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

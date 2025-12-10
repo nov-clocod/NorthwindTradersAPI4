@@ -1,7 +1,7 @@
 package com.pluralsight.NorthwindTradersAPI4.dao.implementations;
 
-import com.pluralsight.northwindTradersAPI3.dao.interfaces.IProductDAO;
-import com.pluralsight.northwindTradersAPI3.models.Product;
+import com.pluralsight.NorthwindTradersAPI4.dao.interfaces.IProductDAO;
+import com.pluralsight.NorthwindTradersAPI4.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -67,6 +67,40 @@ public class JDBCProductDAO implements IProductDAO {
                     double productPrice = resultSet.getDouble("UnitPrice");
 
                     product = new Product(productIDFromDB, productName, categoryID, productPrice);
+                }
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error occurred");
+            System.out.println(ex.getErrorCode());
+        }
+        return product;
+    }
+
+    @Override
+    public Product addProduct(Product product) {
+        String insertDataQuery = """
+                INSERT INTO products (ProductName, CategoryID, UnitPrice)
+                VALUES (?, ?, ?)
+                """;
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement insertStatement = connection.prepareStatement(insertDataQuery, Statement.RETURN_GENERATED_KEYS)) {
+            insertStatement.setString(1, product.getProductName());
+            insertStatement.setInt(2, product.getCategoryID());
+            insertStatement.setDouble(3, product.getUnitPrice());
+
+            int affectedRows = insertStatement.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException("Creating Product failed, no rows affected.");
+            }
+
+            try (ResultSet generatedKeys = insertStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int generatedID = generatedKeys.getInt(1);
+                    product.setProductID(generatedID);
+                } else {
+                    throw new SQLException("Creating Product failed, no ID obtained.");
                 }
             }
         } catch (SQLException ex) {
